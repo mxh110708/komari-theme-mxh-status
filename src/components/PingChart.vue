@@ -196,7 +196,8 @@ async function fetchRecords() {
     }
   }
   catch (err) {
-    error.value = err instanceof Error ? err.message : '获取数据失败'
+    console.error('延迟数据加载失败', err)
+    error.value = '无法加载延迟数据，请稍后重试。'
     remoteData.value = []
     tasks.value = []
   }
@@ -578,7 +579,7 @@ onBeforeUnmount(() => {
           :class="!selectedTaskIds.length && 'shadow-[0_0_0_2px] shadow-green-600/10 text-green-600'"
           @click="hideAllTasks"
         >
-          全不选
+          取消全选
         </Button>
       </div>
     </Tabs>

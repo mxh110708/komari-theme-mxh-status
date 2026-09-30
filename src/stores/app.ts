@@ -58,6 +58,8 @@ type ThemeSettings = Record<string, unknown>
 
 const SECURE_REMOTE_URL_PATTERN = /^https:\/\//i
 const OPTION_SEPARATOR_PATTERN = /[\s_-]+/g
+const KEY_LIST_SEPARATOR_PATTERN = /[,，]/
+const KEY_LABEL_SPACE_PATTERN = /\s+/g
 
 /** 固定的字节精度配置 */
 const BYTE_DECIMALS: ByteDecimalsConfig = {
@@ -243,19 +245,27 @@ const HOME_QUICK_CONTROL_PRESET_ALIASES: Record<string, HomeQuickControlPreset> 
 const MANAGED_THEME_MODE_ALIASES: Record<string, ManagedThemeMode> = {
   beijing: 'beijing',
   beijingtime: 'beijing',
+  自动: 'beijing',
   light: 'light',
+  浅色: 'light',
   dark: 'dark',
+  深色: 'dark',
 }
 
 const NODE_VIEW_MODE_ALIASES: Record<string, NodeViewMode> = {
   card: 'card',
+  卡片: 'card',
   list: 'list',
+  列表: 'list',
 }
 
 const NODE_CARD_SIZE_ALIASES: Record<string, NodeCardSize> = {
   compact: 'compact',
+  紧凑: 'compact',
   comfortable: 'comfortable',
+  标准: 'comfortable',
   large: 'large',
+  大型: 'large',
 }
 
 const RPC_TRANSPORT_MODE_ALIASES: Record<string, RpcTransportMode> = {
@@ -265,25 +275,81 @@ const RPC_TRANSPORT_MODE_ALIASES: Record<string, RpcTransportMode> = {
 
 const EARTH_RENDERER_ALIASES: Record<string, EarthRenderer> = {
   realistic: 'realistic',
+  立体地球: 'realistic',
   cobe: 'cobe',
+  点阵地球: 'cobe',
   tiled: 'tiled',
+  平面地图: 'tiled',
 }
 
 const HOME_QUICK_DEFAULT_CONTROL_ALIASES: Record<string, HomeQuickControlKey> = {
   default: 'default',
+  默认: 'default',
   monthlycost: 'monthlyCost',
+  月费用: 'monthlyCost',
   totaltraffic: 'totalTraffic',
+  累计流量: 'totalTraffic',
   upload: 'upload',
+  上行: 'upload',
   download: 'download',
+  下行: 'download',
   peak: 'peak',
+  峰值: 'peak',
   offline: 'offline',
+  离线: 'offline',
   highload: 'highLoad',
+  高负载: 'highLoad',
   expiring: 'expiring',
+  即将到期: 'expiring',
 }
 
 const BACKGROUND_TYPE_ALIASES: Record<string, 'image' | 'video'> = {
   image: 'image',
+  图片: 'image',
   video: 'video',
+  视频: 'video',
+}
+
+const GENERAL_CARD_KEY_ALIASES: Record<string, GeneralCardKey> = {
+  内存: 'memory',
+  硬盘: 'disk',
+  剩余价值: 'remainingValue',
+  累计流量: 'totalTraffic',
+  实时上行: 'uploadSpeed',
+  实时下行: 'downloadSpeed',
+  在线节点: 'onlineNodes',
+  离线节点: 'offlineNodes',
+  高负载节点: 'highLoadNodes',
+  即将到期: 'expiringNodes',
+  实时峰值: 'trafficPeak',
+  上行最高: 'uploadPeakNode',
+  下行最高: 'downloadPeakNode',
+  流量预警: 'trafficWarnings',
+  连接峰值: 'connectionPeakNode',
+  月费用: 'monthlyCost',
+  年费用: 'yearlyCost',
+  平均CPU: 'avgCpu',
+  平均负载: 'avgLoad',
+  交换内存: 'swap',
+  进程数: 'processes',
+  连接数: 'connections',
+  CPU核心: 'cpuCores',
+  流量配额: 'trafficQuota',
+  地区分布: 'regionDistribution',
+  系统分布: 'systemDistribution',
+  虚拟化: 'virtualizationDistribution',
+}
+
+const HOME_QUICK_CONTROL_KEY_ALIASES: Record<string, HomeQuickControlKey> = {
+  默认: 'default',
+  月费用: 'monthlyCost',
+  累计流量: 'totalTraffic',
+  上行: 'upload',
+  下行: 'download',
+  峰值: 'peak',
+  离线: 'offline',
+  高负载: 'highLoad',
+  即将到期: 'expiring',
 }
 
 const EMPTY_THEME_SETTINGS: ThemeSettings = {}
@@ -349,13 +415,14 @@ function normalizeThemeSettings(raw: unknown): ThemeSettings {
   return EMPTY_THEME_SETTINGS
 }
 
-function parseKeyList<T extends string>(rawValue: unknown, isValid: (value: string) => value is T, fallback: readonly T[]): T[] {
+function parseKeyList<T extends string>(rawValue: unknown, isValid: (value: string) => value is T, fallback: readonly T[], aliases: Readonly<Record<string, T>> = {}): T[] {
   const parsedKeys: T[] = []
   const seenKeys = new Set<T>()
 
   if (typeof rawValue === 'string') {
-    for (const item of rawValue.split(',')) {
-      const key = item.trim()
+    for (const item of rawValue.split(KEY_LIST_SEPARATOR_PATTERN)) {
+      const token = item.trim()
+      const key = aliases[token.replace(KEY_LABEL_SPACE_PATTERN, '')] ?? token
       if (!isValid(key) || seenKeys.has(key))
         continue
       parsedKeys.push(key)
@@ -503,15 +570,15 @@ const useAppStore = defineStore('app', () => {
 
     if (hasNewPreset) {
       if (preset === 'custom')
-        return parseKeyList(settings.generalCardKeys, isGeneralCardKey, DEFAULT_GENERAL_CARD_ORDER)
+        return parseKeyList(settings.generalCardKeys, isGeneralCardKey, DEFAULT_GENERAL_CARD_ORDER, GENERAL_CARD_KEY_ALIASES)
 
       return [...GENERAL_CARD_PRESETS[preset]]
     }
 
     if (typeof settings.generalCardKeys === 'string')
-      return parseKeyList(settings.generalCardKeys, isGeneralCardKey, DEFAULT_GENERAL_CARD_ORDER)
+      return parseKeyList(settings.generalCardKeys, isGeneralCardKey, DEFAULT_GENERAL_CARD_ORDER, GENERAL_CARD_KEY_ALIASES)
 
-    const orderedKeys = parseKeyList(settings.generalCardOrder, isGeneralCardKey, DEFAULT_GENERAL_CARD_ORDER)
+    const orderedKeys = parseKeyList(settings.generalCardOrder, isGeneralCardKey, DEFAULT_GENERAL_CARD_ORDER, GENERAL_CARD_KEY_ALIASES)
     const orderedKeySet = new Set<GeneralCardKey>(orderedKeys)
     for (const key of ALL_GENERAL_CARD_KEYS) {
       if (orderedKeySet.has(key))
@@ -529,10 +596,10 @@ const useAppStore = defineStore('app', () => {
     const settings = themeSettings.value
     const preset = parseHomeQuickControlPreset(settings.homeQuickControlPreset)
     if (preset === 'custom')
-      return parseKeyList(settings.homeQuickControlKeys, isHomeQuickControlKey, DEFAULT_HOME_QUICK_CONTROL_ORDER)
+      return parseKeyList(settings.homeQuickControlKeys, isHomeQuickControlKey, DEFAULT_HOME_QUICK_CONTROL_ORDER, HOME_QUICK_CONTROL_KEY_ALIASES)
 
     if (typeof settings.homeQuickControlKeys === 'string' && typeof settings.homeQuickControlPreset !== 'string')
-      return parseKeyList(settings.homeQuickControlKeys, isHomeQuickControlKey, DEFAULT_HOME_QUICK_CONTROL_ORDER)
+      return parseKeyList(settings.homeQuickControlKeys, isHomeQuickControlKey, DEFAULT_HOME_QUICK_CONTROL_ORDER, HOME_QUICK_CONTROL_KEY_ALIASES)
 
     return [...HOME_QUICK_CONTROL_PRESETS[preset]]
   })

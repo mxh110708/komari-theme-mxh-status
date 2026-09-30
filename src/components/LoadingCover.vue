@@ -16,7 +16,7 @@ const isDark = computed(() => appStore.isDark)
         class="inline-block size-7 animate-spin rounded-full border-2"
         style="border-color: color-mix(in srgb, currentColor 18%, transparent); border-top-color: currentColor;"
       />
-      <span class="text-sm text-muted-foreground">Loading...</span>
+      <span class="text-sm text-muted-foreground">正在加载…</span>
     </div>
   </div>
 </template>

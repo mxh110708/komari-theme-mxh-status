@@ -1,8 +1,8 @@
 {
-  "name": "Komari Glassmorphism Enhanced (MXH)",
+  "name": "Komari 毛玻璃增强主题（MXH）",
   "short": "GlassmorphismEnhanced",
   "description": "MXH 个人适配版 Komari 毛玻璃主题，支持历史指标兼容访问、自定义站点图标、默认节点顺序及 IPv4/IPv6/WARP 三网延迟与丢包历史",
-  "version": "2.2.2-mxh.4",
+  "version": "2.2.2-mxh.5",
   "author": "jianmomo / mxh110708",
   "url": "https://github.com/mxh110708/komari-theme-Glassmorphism-Enhanced-Custom",
   "preview": "preview-v2.0.0.png",
@@ -15,34 +15,34 @@
         "type": "title"
       },
       {
-        "name": "<div style=\"display:grid;gap:8px;padding:4px 2px 8px;color:var(--gray-11)\"><div style=\"font-size:14px;line-height:1.7\">统一配置主题外观、数据刷新与节点展示方式。选项名称采用规范写法，说明只保留当前设置所需的信息。</div></div>",
+        "name": "<div style=\"display:grid;gap:8px;padding:4px 2px 8px;color:var(--gray-11)\"><div style=\"font-size:14px;line-height:1.7\">设置主题外观、数据刷新周期与节点展示方式。</div></div>",
         "type": "textbox"
       },
       {
         "key": "themeMode",
         "name": "默认主题模式",
         "type": "select",
-        "default": "Beijing",
-        "options": "Beijing,Light,Dark",
-        "help": "Beijing 按北京时间 07:00–18:59 使用浅色，其余时间使用深色；访客仍可在页面右上角临时切换。"
+        "default": "自动",
+        "options": "自动,浅色,深色",
+        "help": "自动模式按北京时间在 07:00–18:59 使用浅色，其余时段使用深色。页眉按钮可切换当前浏览器的显示模式。"
       },
       {
         "key": "dataUpdateInterval",
-        "name": "数据更新间隔",
+        "name": "数据更新间隔（秒）",
         "type": "number",
         "default": 3,
-        "help": "实时数据刷新间隔，单位为秒；建议设置为 1–10。"
+        "help": "实时数据刷新周期，取值范围为 1–60 秒。"
       },
       {
-        "name": "<div style=\"display:grid;gap:12px;padding:16px 18px;border:1px solid var(--gray-a6);border-radius:12px;background:linear-gradient(135deg,var(--accent-a3),var(--gray-a2))\"><div style=\"display:grid;gap:4px\"><strong style=\"font-size:15px;color:var(--gray-12)\">本地站点图标</strong><span style=\"font-size:13px;line-height:1.65;color:var(--gray-11)\">使用 Komari 官方上传功能保存图标，无需外部图床。上传后同时用于浏览器标签页和主题页眉；文件上限为 5 MiB。</span></div><div style=\"display:flex;align-items:center;gap:10px;flex-wrap:wrap\"><a href=\"/admin/settings/site\" target=\"_blank\" rel=\"noopener noreferrer\" style=\"display:inline-flex;align-items:center;justify-content:center;min-height:34px;padding:0 14px;border-radius:8px;background:var(--accent-9);color:white;font-size:13px;font-weight:600;text-decoration:none\">打开本地图标上传</a><span style=\"font-size:12px;line-height:1.5;color:var(--gray-10)\">在新页面的“自定义 Favicon”区域上传、预览或恢复默认。</span></div></div>",
+        "name": "<div style=\"display:grid;gap:12px;padding:16px 18px;border:1px solid var(--gray-a6);border-radius:12px;background:linear-gradient(135deg,var(--accent-a3),var(--gray-a2))\"><div style=\"display:grid;gap:4px\"><strong style=\"font-size:15px;color:var(--gray-12)\">站点图标</strong><span style=\"font-size:13px;line-height:1.65;color:var(--gray-11)\">上传至本站后，用于浏览器标签页和主题页眉。文件大小不得超过 5 MiB。</span></div><div style=\"display:flex;align-items:center;gap:10px;flex-wrap:wrap\"><a href=\"/admin/settings/site\" target=\"_blank\" rel=\"noopener noreferrer\" style=\"display:inline-flex;align-items:center;justify-content:center;min-height:34px;padding:0 14px;border-radius:8px;background:var(--accent-9);color:white;font-size:13px;font-weight:600;text-decoration:none\">上传站点图标</a><span style=\"font-size:12px;line-height:1.5;color:var(--gray-10)\">打开站点设置，在图标设置区域上传或恢复默认图标。</span></div></div>",
         "type": "textbox"
       },
       {
         "key": "siteIconUrl",
-        "name": "外部图标 URL（可选）",
+        "name": "外部图标地址（可选）",
         "type": "string",
         "default": "",
-        "help": "填写后覆盖本地图标；留空则使用 Komari 已上传的 /favicon.ico，未上传时回退到主题默认图标。"
+        "help": "填写 HTTPS 地址或以 / 开头的站内路径。设置后优先使用此图标；留空时使用已上传的站点图标，未上传则使用默认图标。"
       },
       {
         "key": "rpcTransportMode",
@@ -50,30 +50,30 @@
         "type": "select",
         "default": "HTTP",
         "options": "HTTP,WebSocket",
-        "help": "HTTP 兼容性最佳；仅在反向代理已正确支持 WebSocket 时切换。"
+        "help": "默认使用 HTTP。选择 WebSocket 前，请确认反向代理支持连接升级。"
       },
       {
         "key": "defaultViewMode",
         "name": "默认视图模式",
         "type": "select",
-        "default": "Card",
-        "options": "Card,List",
-        "help": "设置首页节点默认使用卡片视图或列表视图。"
+        "default": "卡片",
+        "options": "卡片,列表",
+        "help": "设置首页节点的默认展示方式；访客可在页面中切换视图。"
       },
       {
         "key": "nodeCardSize",
         "name": "节点卡片尺寸",
         "type": "select",
-        "default": "Compact",
-        "options": "Compact,Comfortable,Large",
-        "help": "Compact 最紧凑，Comfortable 留白更多，Large 使用大尺寸卡片。"
+        "default": "紧凑",
+        "options": "紧凑,标准,大型",
+        "help": "设置节点卡片的宽度与间距，仅对卡片视图生效。"
       },
       {
         "name": "首页模块设置",
         "type": "title"
       },
       {
-        "name": "<div style=\"display:grid;gap:8px;padding:4px 2px 8px;color:var(--gray-11)\"><div style=\"font-size:14px;line-height:1.7\">控制首页公告、地球、总览卡片与访客信息。常用开关保持简洁，高级字段说明集中收纳。</div></div>",
+        "name": "<div style=\"display:grid;gap:8px;padding:4px 2px 8px;color:var(--gray-11)\"><div style=\"font-size:14px;line-height:1.7\">设置首页公告、地球展示、总览卡片与访客信息。</div></div>",
         "type": "textbox"
       },
       {
@@ -95,22 +95,22 @@
         "name": "公告内容",
         "type": "richtext",
         "default": "",
-        "help": "公告正文，支持简单 Markdown。"
+        "help": "设置公告正文，支持基础 Markdown 格式。"
       },
       {
         "key": "stopEarth",
         "name": "停止地球旋转",
         "type": "switch",
         "default": false,
-        "help": "停止自动旋转，但仍允许访客手动拖拽。"
+        "help": "关闭地球的自动旋转；手动拖动不受影响。"
       },
       {
         "key": "earthRenderer",
-        "name": "地球样式",
+        "name": "地球与地图样式",
         "type": "select",
-        "default": "Realistic",
-        "options": "Realistic,Cobe,Tiled",
-        "help": "Realistic 为贴图地球，Cobe 为点阵地球，Tiled 为平铺地图。"
+        "default": "立体地球",
+        "options": "立体地球,点阵地球,平面地图",
+        "help": "选择首页地球或地图的展示样式。"
       },
       {
         "key": "hideEarth",
@@ -121,7 +121,7 @@
       },
       {
         "key": "hideGeneralCard",
-        "name": "隐藏头部",
+        "name": "隐藏首页总览区域",
         "type": "switch",
         "default": false,
         "help": "同时隐藏地球与首页总览卡片。"
@@ -131,25 +131,25 @@
         "name": "显示访客信息",
         "type": "switch",
         "default": true,
-        "help": "显示底部访客 IP 条与访客详情卡片。"
+        "help": "显示当前访客的 IP 地址与设备信息。"
       },
       {
         "key": "generalCardPreset",
-        "name": "头部卡片方案",
+        "name": "总览卡片方案",
         "type": "select",
         "default": "基础",
         "options": "基础,运维,财务,流量,完整,自定义",
-        "help": "选择预设卡片组合；选择“自定义”后使用下方字段。"
+        "help": "选择总览指标组合；自定义方案使用下方指定的指标。"
       },
       {
         "key": "generalCardKeys",
-        "name": "高级：自定义头部卡片",
+        "name": "自定义总览指标",
         "type": "string",
         "default": "",
-        "help": "仅在头部卡片方案为“自定义”时生效；使用英文逗号分隔字段名。"
+        "help": "仅对自定义方案生效。按显示顺序填写指标名称，以逗号分隔。"
       },
       {
-        "name": "<details style=\"padding:12px 14px;border:1px solid var(--gray-a5);border-radius:10px;background:var(--gray-a2)\"><summary style=\"cursor:pointer;font-size:13px;font-weight:600;color:var(--gray-12)\">查看自定义头部卡片字段</summary><div style=\"margin-top:10px;font-size:12px;line-height:1.85;color:var(--gray-11)\"><code>memory</code> 内存 · <code>disk</code> 硬盘 · <code>remainingValue</code> 剩余价值 · <code>totalTraffic</code> 累计流量 · <code>uploadSpeed</code> 实时上行 · <code>downloadSpeed</code> 实时下行 · <code>onlineNodes</code> 在线节点 · <code>offlineNodes</code> 离线节点 · <code>highLoadNodes</code> 高负载 · <code>expiringNodes</code> 即将到期 · <code>trafficPeak</code> 实时峰值 · <code>uploadPeakNode</code> 上行最高 · <code>downloadPeakNode</code> 下行最高 · <code>trafficWarnings</code> 流量预警 · <code>connectionPeakNode</code> 连接峰值 · <code>monthlyCost</code> 月费用 · <code>yearlyCost</code> 年费用 · <code>avgCpu</code> 平均 CPU · <code>avgLoad</code> 平均负载 · <code>swap</code> 交换内存 · <code>processes</code> 进程数 · <code>connections</code> 连接数 · <code>cpuCores</code> CPU 核心 · <code>trafficQuota</code> 流量配额 · <code>regionDistribution</code> 地区分布 · <code>systemDistribution</code> 系统分布 · <code>virtualizationDistribution</code> 虚拟化</div></details>",
+        "name": "<details style=\"padding:12px 14px;border:1px solid var(--gray-a5);border-radius:10px;background:var(--gray-a2)\"><summary style=\"cursor:pointer;font-size:13px;font-weight:600;color:var(--gray-12)\">可用总览指标</summary><div style=\"margin-top:10px;font-size:12px;line-height:1.85;color:var(--gray-11)\">内存、硬盘、剩余价值、累计流量、实时上行、实时下行、在线节点、离线节点、高负载节点、即将到期、实时峰值、上行最高、下行最高、流量预警、连接峰值、月费用、年费用、平均 CPU、平均负载、交换内存、进程数、连接数、CPU 核心、流量配额、地区分布、系统分布、虚拟化。</div></details>",
         "type": "textbox"
       },
       {
@@ -161,17 +161,17 @@
       },
       {
         "key": "hidePriceWhenLoggedOut",
-        "name": "未登录隐藏价格",
+        "name": "未登录时隐藏价格",
         "type": "switch",
         "default": false,
         "help": "访客未登录时隐藏价格、剩余价值与费用信息。"
       },
       {
         "key": "providerAliases",
-        "name": "厂商自定义别名",
+        "name": "服务商识别别名",
         "type": "string",
         "default": "",
-        "help": "格式：厂商名:别名1,别名2；多组之间使用英文分号。"
+        "help": "格式：服务商名称:别名1,别名2；多组以英文分号（;）分隔。"
       },
       {
         "key": "disablePageAnimation",
@@ -185,12 +185,12 @@
         "type": "title"
       },
       {
-        "name": "<div style=\"display:grid;gap:8px;padding:4px 2px 8px;color:var(--gray-11)\"><div style=\"font-size:14px;line-height:1.7\">配置首页筛选按钮、默认排序与告警阈值。节点默认顺序保持为 DMIT、VMISS、YUNYOO、BreadCloud。</div></div>",
+        "name": "<div style=\"display:grid;gap:8px;padding:4px 2px 8px;color:var(--gray-11)\"><div style=\"font-size:14px;line-height:1.7\">设置首页筛选、节点排序与预警阈值。</div></div>",
         "type": "textbox"
       },
       {
         "key": "homeQuickControlsEnabled",
-        "name": "显示主页快捷控制",
+        "name": "显示首页快捷控制",
         "type": "switch",
         "default": true,
         "help": "在节点分组旁显示筛选和排序快捷按钮。"
@@ -201,25 +201,25 @@
         "type": "select",
         "default": "完整",
         "options": "基础,流量,运维,完整,自定义",
-        "help": "选择预设快捷按钮组合；选择“自定义”后使用下方字段。"
+        "help": "选择筛选与排序按钮组合；自定义方案使用下方指定的按钮。"
       },
       {
         "key": "homeQuickControlKeys",
-        "name": "高级：自定义快捷按钮",
+        "name": "自定义快捷按钮",
         "type": "string",
         "default": "",
-        "help": "仅在快捷控制方案为“自定义”时生效；使用英文逗号分隔字段名。"
+        "help": "仅对自定义方案生效。按显示顺序填写按钮名称，以逗号分隔。"
       },
       {
-        "name": "<details style=\"padding:12px 14px;border:1px solid var(--gray-a5);border-radius:10px;background:var(--gray-a2)\"><summary style=\"cursor:pointer;font-size:13px;font-weight:600;color:var(--gray-12)\">查看自定义快捷按钮字段</summary><div style=\"margin-top:10px;font-size:12px;line-height:1.85;color:var(--gray-11)\"><code>default</code> 默认 · <code>monthlyCost</code> 月成本 · <code>totalTraffic</code> 总流量 · <code>upload</code> 上行 · <code>download</code> 下行 · <code>peak</code> 实时峰值 · <code>offline</code> 离线 · <code>highLoad</code> 高负载 · <code>expiring</code> 即将到期</div></details>",
+        "name": "<details style=\"padding:12px 14px;border:1px solid var(--gray-a5);border-radius:10px;background:var(--gray-a2)\"><summary style=\"cursor:pointer;font-size:13px;font-weight:600;color:var(--gray-12)\">可用快捷按钮</summary><div style=\"margin-top:10px;font-size:12px;line-height:1.85;color:var(--gray-11)\">默认、月费用、累计流量、上行、下行、峰值、离线、高负载、即将到期。</div></details>",
         "type": "textbox"
       },
       {
         "key": "homeQuickDefaultControl",
         "name": "默认快捷模式",
         "type": "select",
-        "default": "Default",
-        "options": "Default,Monthly Cost,Total Traffic,Upload,Download,Peak,Offline,High Load,Expiring",
+        "default": "默认",
+        "options": "默认,月费用,累计流量,上行,下行,峰值,离线,高负载,即将到期",
         "help": "设置进入首页时自动启用的筛选或排序模式。"
       },
       {
@@ -227,35 +227,35 @@
         "name": "默认节点顺序",
         "type": "string",
         "default": "DMIT,VMISS,YUNYOO,BreadCloud",
-        "help": "按节点名称关键词排序，英文逗号分隔且不区分大小写；未匹配节点保留原 weight 顺序。"
+        "help": "按顺序填写节点名称关键词，以英文逗号（,）分隔，不区分大小写。未匹配节点按 Komari 中设置的顺序排列。"
       },
       {
         "key": "homeHighLoadThreshold",
-        "name": "高负载阈值",
+        "name": "高负载阈值（%）",
         "type": "number",
         "default": 80,
-        "help": "CPU、内存或硬盘占用达到该百分比时标记为高负载。"
+        "help": "CPU、内存或硬盘使用率达到该值时标记为高负载，取值范围为 1–100。"
       },
       {
         "key": "homeTrafficWarningThreshold",
-        "name": "流量预警阈值",
+        "name": "流量预警阈值（%）",
         "type": "number",
         "default": 80,
-        "help": "流量配额使用率达到该百分比时显示预警。"
+        "help": "流量配额使用率达到该值时显示预警，取值范围为 1–100。"
       },
       {
         "key": "homeExpiringDays",
-        "name": "即将到期天数",
+        "name": "到期预警天数",
         "type": "number",
         "default": 30,
-        "help": "剩余天数小于等于该值时标记为即将到期。"
+        "help": "剩余使用天数不超过该值时标记为即将到期。"
       },
       {
         "name": "自定义背景",
         "type": "title"
       },
       {
-        "name": "<div style=\"display:grid;gap:8px;padding:4px 2px 8px;color:var(--gray-11)\"><div style=\"font-size:14px;line-height:1.7\">可分别为浅色与深色模式设置背景。为保证加载速度与隐私，建议使用尺寸适当、来源稳定的 HTTPS 资源。</div></div>",
+        "name": "<div style=\"display:grid;gap:8px;padding:4px 2px 8px;color:var(--gray-11)\"><div style=\"font-size:14px;line-height:1.7\">分别设置浅色与深色模式的背景，以及模糊和遮罩效果。</div></div>",
         "type": "textbox"
       },
       {
@@ -263,43 +263,43 @@
         "name": "启用自定义背景",
         "type": "switch",
         "default": false,
-        "help": "启用后使用下方地址作为页面背景。"
+        "help": "启用后，根据当前主题模式加载对应的背景资源。"
       },
       {
         "key": "backgroundType",
         "name": "背景类型",
         "type": "select",
-        "default": "Image",
-        "options": "Image,Video",
+        "default": "图片",
+        "options": "图片,视频",
         "help": "选择静态图片或视频背景。"
       },
       {
         "key": "lightBackgroundUrl",
-        "name": "亮色模式背景地址",
+        "name": "浅色模式背景地址",
         "type": "string",
         "default": "",
         "help": "浅色模式使用的 HTTPS 图片或视频地址。"
       },
       {
         "key": "darkBackgroundUrl",
-        "name": "暗色模式背景地址",
+        "name": "深色模式背景地址",
         "type": "string",
         "default": "",
         "help": "深色模式使用的 HTTPS 图片或视频地址。"
       },
       {
         "key": "backgroundBlur",
-        "name": "背景模糊半径",
+        "name": "背景模糊半径（像素）",
         "type": "number",
         "default": 0,
-        "help": "高斯模糊半径，单位为 px；0 表示关闭。"
+        "help": "设置背景的高斯模糊半径，0 表示不使用模糊。"
       },
       {
         "key": "backgroundOverlay",
-        "name": "背景遮罩强度",
+        "name": "背景遮罩强度（%）",
         "type": "number",
         "default": 0,
-        "help": "范围 -100 至 100；0 关闭，正数增加黑色遮罩，负数降低背景可见度。"
+        "help": "取值范围为 -100–100。正值增加黑色遮罩，负值降低背景不透明度，0 表示不调整。"
       }
     ]
   }

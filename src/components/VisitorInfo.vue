@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
 import { onMounted, ref } from 'vue'
+import { getRegionByAlias } from '@/utils/regionHelper'
 
 interface VisitorData {
   ip: string
@@ -33,7 +34,7 @@ onMounted(async () => {
       ip: data.ip,
       city: data.city,
       region: data.region,
-      country: data.country_name,
+      country: getRegionByAlias(typeof data.country === 'string' ? data.country : '')?.zh ?? data.country_name ?? '未知地区',
       org: data.org,
     }
   }
@@ -67,14 +68,14 @@ function getOsIcon(): string {
 function getBrowserName(): string {
   const ua = navigator.userAgent
   if (edgPattern.test(ua))
-    return 'Edge Browser'
+    return 'Edge 浏览器'
   if (chromePattern.test(ua))
-    return 'Chrome Browser'
+    return 'Chrome 浏览器'
   if (firefoxPattern.test(ua))
-    return 'Firefox Browser'
+    return 'Firefox 浏览器'
   if (safariPattern.test(ua))
-    return 'Safari Browser'
-  return 'Unknown Browser'
+    return 'Safari 浏览器'
+  return '未知浏览器'
 }
 
 function getOsName(): string {
@@ -89,7 +90,7 @@ function getOsName(): string {
     return 'iOS'
   if (linuxPattern.test(ua))
     return 'Linux'
-  return 'Unknown OS'
+  return '未知操作系统'
 }
 
 function formatDate(): string {
@@ -117,7 +118,7 @@ const siteName = '访客'
              shadow-lg text-[13px] select-none whitespace-nowrap"
     >
       <Icon icon="icon-park-outline:earth" :width="14" :height="14" class="text-blue-500 shrink-0" />
-      <span class="text-muted-foreground">Your IP:</span>
+      <span class="text-muted-foreground">IP 地址：</span>
       <span class="font-semibold text-foreground">{{ visitor.ip }}</span>
       <span class="text-muted-foreground/40">|</span>
       <span class="text-muted-foreground">{{ visitor.country }}</span>
@@ -149,6 +150,7 @@ const siteName = '访客'
           </div>
         </div>
         <button
+          aria-label="关闭访客信息"
           class="size-6 rounded-full flex items-center justify-center
                  hover:bg-black/8 dark:hover:bg-white/10 transition-colors"
           @click="dismiss"
@@ -157,10 +159,10 @@ const siteName = '访客'
         </button>
       </div>
 
-      <!-- Welcome 文字 -->
+      <!-- 访问来源 -->
       <div class="px-4 pb-2">
         <p class="text-[12px] text-foreground/70">
-          Welcome from {{ visitor.city }}!
+          访问来源：{{ visitor.country }}
         </p>
       </div>
 

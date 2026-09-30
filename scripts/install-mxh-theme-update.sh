@@ -154,16 +154,16 @@ with zipfile.ZipFile(archive_path) as archive:
         raise SystemExit("Local favicon upload link is missing")
 
     expected_choices = {
-        "themeMode": ("Beijing", "Beijing,Light,Dark"),
+        "themeMode": ("自动", "自动,浅色,深色"),
         "rpcTransportMode": ("HTTP", "HTTP,WebSocket"),
-        "defaultViewMode": ("Card", "Card,List"),
-        "nodeCardSize": ("Compact", "Compact,Comfortable,Large"),
-        "earthRenderer": ("Realistic", "Realistic,Cobe,Tiled"),
+        "defaultViewMode": ("卡片", "卡片,列表"),
+        "nodeCardSize": ("紧凑", "紧凑,标准,大型"),
+        "earthRenderer": ("立体地球", "立体地球,点阵地球,平面地图"),
         "homeQuickDefaultControl": (
-            "Default",
-            "Default,Monthly Cost,Total Traffic,Upload,Download,Peak,Offline,High Load,Expiring",
+            "默认",
+            "默认,月费用,累计流量,上行,下行,峰值,离线,高负载,即将到期",
         ),
-        "backgroundType": ("Image", "Image,Video"),
+        "backgroundType": ("图片", "图片,视频"),
     }
     items_by_key = {
         item.get("key"): item
@@ -203,12 +203,12 @@ chown -R komari:komari "$THEME_DIR"
 find "$THEME_DIR" -type d -exec chmod 0755 {} +
 find "$THEME_DIR" -type f -exec chmod 0644 {} +
 
-python3 - "$DB_PATH" "$THEME_SHORT" "$DEFAULT_NODE_ORDER" <<'PY'
+python3 - "$DB_PATH" "$THEME_SHORT" <<'PY'
 import json
 import sqlite3
 import sys
 
-database, theme, default_order = sys.argv[1:]
+database, theme = sys.argv[1:]
 connection = sqlite3.connect(database)
 try:
     connection.execute("BEGIN IMMEDIATE")
@@ -232,29 +232,40 @@ try:
 
     choice_migrations = {
         "themeMode": ({
-            "beijing": "Beijing",
-            "beijingtime": "Beijing",
-            "light": "Light",
-            "dark": "Dark",
-        }, "Beijing"),
+            "beijing": "自动",
+            "beijingtime": "自动",
+            "自动": "自动",
+            "light": "浅色",
+            "浅色": "浅色",
+            "dark": "深色",
+            "深色": "深色",
+        }, "自动"),
         "rpcTransportMode": ({
             "http": "HTTP",
             "websocket": "WebSocket",
         }, "HTTP"),
         "defaultViewMode": ({
-            "card": "Card",
-            "list": "List",
-        }, "Card"),
+            "card": "卡片",
+            "卡片": "卡片",
+            "list": "列表",
+            "列表": "列表",
+        }, "卡片"),
         "nodeCardSize": ({
-            "compact": "Compact",
-            "comfortable": "Comfortable",
-            "large": "Large",
-        }, "Compact"),
+            "compact": "紧凑",
+            "紧凑": "紧凑",
+            "comfortable": "标准",
+            "标准": "标准",
+            "large": "大型",
+            "大型": "大型",
+        }, "紧凑"),
         "earthRenderer": ({
-            "realistic": "Realistic",
-            "cobe": "Cobe",
-            "tiled": "Tiled",
-        }, "Realistic"),
+            "realistic": "立体地球",
+            "立体地球": "立体地球",
+            "cobe": "点阵地球",
+            "点阵地球": "点阵地球",
+            "tiled": "平面地图",
+            "平面地图": "平面地图",
+        }, "立体地球"),
         "generalCardPreset": ({
             "basic": "基础",
             "基础": "基础",
@@ -282,26 +293,40 @@ try:
             "自定义": "自定义",
         }, "完整"),
         "homeQuickDefaultControl": ({
-            "default": "Default",
-            "monthlycost": "Monthly Cost",
-            "totaltraffic": "Total Traffic",
-            "upload": "Upload",
-            "download": "Download",
-            "peak": "Peak",
-            "offline": "Offline",
-            "highload": "High Load",
-            "expiring": "Expiring",
-        }, "Default"),
+            "default": "默认",
+            "默认": "默认",
+            "monthlycost": "月费用",
+            "月费用": "月费用",
+            "totaltraffic": "累计流量",
+            "累计流量": "累计流量",
+            "upload": "上行",
+            "上行": "上行",
+            "download": "下行",
+            "下行": "下行",
+            "peak": "峰值",
+            "峰值": "峰值",
+            "offline": "离线",
+            "离线": "离线",
+            "highload": "高负载",
+            "高负载": "高负载",
+            "expiring": "即将到期",
+            "即将到期": "即将到期",
+        }, "默认"),
         "backgroundType": ({
-            "image": "Image",
-            "video": "Video",
-        }, "Image"),
+            "image": "图片",
+            "图片": "图片",
+            "video": "视频",
+            "视频": "视频",
+        }, "图片"),
     }
 
-    for key, (aliases, default) in choice_migrations.items():
-        settings[key] = aliases.get(normalize_choice(settings.get(key)), default)
-
-    settings["homeDefaultNodeOrder"] = default_order
+    for key, (aliases, _) in choice_migrations.items():
+        if key not in settings:
+            continue
+        normalized = normalize_choice(settings[key])
+        if normalized not in aliases:
+            raise ValueError(f"Unrecognized saved theme choice: {key}")
+        settings[key] = aliases[normalized]
 
     connection.execute(
         "INSERT INTO configs(key, value) VALUES(?, ?) "
@@ -326,7 +351,7 @@ sleep 3
 systemctl is-active --quiet komari.service
 curl --fail --silent --show-error http://127.0.0.1:25774/ping >/dev/null
 
-python3 - "$THEME_DIR" "$DB_PATH" "$THEME_SHORT" "$THEME_VERSION" "$DEFAULT_NODE_ORDER" <<'PY'
+python3 - "$THEME_DIR" "$DB_PATH" "$THEME_SHORT" "$THEME_VERSION" "$DEFAULT_NODE_ORDER" "$db_snapshot" <<'PY'
 import json
 from pathlib import Path
 import sqlite3
@@ -335,7 +360,7 @@ from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
 theme_dir = Path(sys.argv[1])
-database, expected_short, expected_version, expected_order = sys.argv[2:]
+database, expected_short, expected_version, expected_order, snapshot_path = sys.argv[2:]
 
 manifest = json.loads((theme_dir / "komari-theme.json").read_text(encoding="utf-8"))
 if manifest.get("short") != expected_short or manifest.get("version") != expected_version:
@@ -384,18 +409,18 @@ if not icon_item or icon_item.get("default") != "":
     raise SystemExit("Custom site icon setting is missing from the manifest")
 
 expected_saved_choices = {
-    "themeMode": {"Beijing", "Light", "Dark"},
+    "themeMode": {"自动", "浅色", "深色"},
     "rpcTransportMode": {"HTTP", "WebSocket"},
-    "defaultViewMode": {"Card", "List"},
-    "nodeCardSize": {"Compact", "Comfortable", "Large"},
-    "earthRenderer": {"Realistic", "Cobe", "Tiled"},
+    "defaultViewMode": {"卡片", "列表"},
+    "nodeCardSize": {"紧凑", "标准", "大型"},
+    "earthRenderer": {"立体地球", "点阵地球", "平面地图"},
     "generalCardPreset": {"基础", "运维", "财务", "流量", "完整", "自定义"},
     "homeQuickControlPreset": {"基础", "流量", "运维", "完整", "自定义"},
     "homeQuickDefaultControl": {
-        "Default", "Monthly Cost", "Total Traffic", "Upload", "Download",
-        "Peak", "Offline", "High Load", "Expiring",
+        "默认", "月费用", "累计流量", "上行", "下行",
+        "峰值", "离线", "高负载", "即将到期",
     },
-    "backgroundType": {"Image", "Video"},
+    "backgroundType": {"图片", "视频"},
 }
 
 connection = sqlite3.connect(database)
@@ -414,10 +439,21 @@ if not selected_row or json.loads(selected_row[0]) != expected_short:
 if not config_row:
     raise SystemExit("Theme configuration is missing")
 settings = json.loads(config_row[0])
-if settings.get("homeDefaultNodeOrder") != expected_order:
-    raise SystemExit("Default node order was not saved")
+snapshot = sqlite3.connect(snapshot_path)
+try:
+    original_row = snapshot.execute(
+        "SELECT data FROM theme_configurations WHERE short = ?", (expected_short,)
+    ).fetchone()
+finally:
+    snapshot.close()
+original_settings = json.loads(original_row[0]) if original_row and original_row[0] else {}
+if set(settings) != set(original_settings):
+    raise SystemExit("Saved theme configuration keys changed unexpectedly")
+for key, value in original_settings.items():
+    if key not in expected_saved_choices and settings[key] != value:
+        raise SystemExit(f"Unrelated saved theme setting changed: {key}")
 for key, allowed_values in expected_saved_choices.items():
-    if settings.get(key) not in allowed_values:
+    if key in settings and settings[key] not in allowed_values:
         raise SystemExit(f"Managed setting migration failed: {key}")
 
 request_id = 0
@@ -460,7 +496,7 @@ except HTTPError as error:
     history_api_status = "protected"
 
 print("INSTALLED_VERSION=" + expected_version)
-print("DEFAULT_ORDER=ok")
+print("SAVED_PREFERENCES=preserved")
 print("SEVEN_DAY_PRESET=ok")
 print("CUSTOM_SITE_ICON=ok")
 print("LOCAL_ICON_UPLOAD_LINK=ok")

@@ -253,7 +253,7 @@ class InitManager {
 
     // 首次失败时显示提示
     if (attempts === 0) {
-      window.$message?.error('WebSocket 建立失败，正在尝试重连。')
+      window.$message?.error('WebSocket 连接失败，正在重新连接。')
     }
 
     this.nodesStore.updateWsState('reconnecting', attempts + 1)
@@ -284,7 +284,7 @@ class InitManager {
     client.close()
 
     // 显示提示
-    window.$message?.warning('WebSocket 无法连接，尝试回落 POST 模式。')
+    window.$message?.warning('WebSocket 连接不可用，已切换为 HTTP。')
   }
 
   /**

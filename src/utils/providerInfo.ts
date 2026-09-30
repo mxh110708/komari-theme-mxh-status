@@ -252,7 +252,7 @@ export function resolveProviderInfo(input: ProviderResolveInput): ProviderResolv
   const tooltipLines: string[] = []
 
   if (seller) {
-    tooltipLines.push(`商家：${seller.name}`)
+    tooltipLines.push(`服务商：${seller.name}`)
     tooltipLines.push(`来源：${providerSourceLabel(seller.source)}${seller.matched ? `（${seller.matched}）` : ''}`)
   }
   if (network && (!seller || shouldShowNetwork))
@@ -260,7 +260,7 @@ export function resolveProviderInfo(input: ProviderResolveInput): ProviderResolv
   if (input.asn)
     tooltipLines.push(`ASN：${input.asn}`)
   if (input.org)
-    tooltipLines.push(`Org：${cleanProviderOrg(input.org)}`)
+    tooltipLines.push(`组织：${cleanProviderOrg(input.org)}`)
 
   return {
     primary,

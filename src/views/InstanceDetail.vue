@@ -372,12 +372,12 @@ const systemInfo = computed<InfoItem[]>(() => [
   { label: '操作系统', value: data.value?.os ?? '-', icon: 'icon-park-outline:computer' },
   { label: '内核版本', value: data.value?.kernel_version ?? '-', icon: 'icon-park-outline:code' },
   { label: '运行时间', value: formatUptime(data.value?.uptime ?? 0), icon: 'icon-park-outline:timer' },
-  { label: '厂商', value: providerDisplay.value, icon: vpsProvider.value?.primary.icon ?? 'icon-park-outline:server' },
+  { label: '服务商', value: providerDisplay.value, icon: vpsProvider.value?.primary.icon ?? 'icon-park-outline:server' },
 ])
 
 const storageInfo = computed<InfoItem[]>(() => [
   { label: '内存', value: formatBytes(data.value?.mem_total ?? 0), icon: 'icon-park-outline:memory' },
-  { label: '内存交换', value: formatBytes(data.value?.swap_total ?? 0), icon: 'icon-park-outline:switch' },
+  { label: '交换内存', value: formatBytes(data.value?.swap_total ?? 0), icon: 'icon-park-outline:switch' },
   { label: '硬盘', value: formatBytes(data.value?.disk_total ?? 0), icon: 'icon-park-outline:hard-disk' },
 ])
 

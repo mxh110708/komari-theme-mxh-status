@@ -196,7 +196,8 @@ async function fetchRecentData() {
     remoteData.value = records.slice(-maxLength)
   }
   catch (err) {
-    error.value = err instanceof Error ? err.message : '获取数据失败'
+    console.error('负载数据加载失败', err)
+    error.value = '无法加载负载数据，请稍后重试。'
     remoteData.value = []
   }
   finally {
@@ -225,7 +226,8 @@ async function fetchHistoryData() {
     remoteData.value = records
   }
   catch (err) {
-    error.value = err instanceof Error ? err.message : '获取数据失败'
+    console.error('负载历史加载失败', err)
+    error.value = '无法加载负载历史，请稍后重试。'
     remoteData.value = []
   }
   finally {
@@ -457,11 +459,11 @@ const memoryChartOption = computed(() => ({
 
       for (const item of p) {
         const colorDot = `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${item.color};margin-right:8px;flex-shrink:0"></span>`
-        if (item.seriesName === 'RAM') {
-          html += `<div style="display:flex;align-items:center">${colorDot}<span>RAM</span><span style="margin-left:auto;font-weight:600;margin-left:16px">${formatBytes(ramUsed)} (${ramPercent}%)</span></div>`
+        if (item.seriesName === '内存') {
+          html += `<div style="display:flex;align-items:center">${colorDot}<span>内存</span><span style="margin-left:auto;font-weight:600;margin-left:16px">${formatBytes(ramUsed)} (${ramPercent}%)</span></div>`
         }
-        else if (item.seriesName === 'Swap') {
-          html += `<div style="display:flex;align-items:center">${colorDot}<span>Swap</span><span style="margin-left:auto;font-weight:600;margin-left:16px">${formatBytes(swapUsed)} (${swapPercent}%)</span></div>`
+        else if (item.seriesName === '交换内存') {
+          html += `<div style="display:flex;align-items:center">${colorDot}<span>交换内存</span><span style="margin-left:auto;font-weight:600;margin-left:16px">${formatBytes(swapUsed)} (${swapPercent}%)</span></div>`
         }
       }
       html += '</div>'
@@ -481,7 +483,7 @@ const memoryChartOption = computed(() => ({
   },
   series: [
     {
-      name: 'RAM',
+      name: '内存',
       type: 'line',
       data: chartData.value.map(r => r.ram ?? 0),
 
@@ -502,7 +504,7 @@ const memoryChartOption = computed(() => ({
       },
     },
     {
-      name: 'Swap',
+      name: '交换内存',
       type: 'line',
       data: chartData.value.map(r => r.swap ?? 0),
 

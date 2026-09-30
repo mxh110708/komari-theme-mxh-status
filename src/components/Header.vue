@@ -43,8 +43,8 @@ function handleSiteIconError() {
 const actionButtons = computed(() => {
   const themeTitleMap = {
     auto: appStore.managedThemeMode === 'beijing'
-      ? appStore.isBeijingDaytime ? '自动主题：北京时间日间' : '自动主题：北京时间夜间'
-      : appStore.managedThemeMode === 'light' ? '自动主题：后台浅色' : '自动主题：后台深色',
+      ? appStore.isBeijingDaytime ? '自动模式：浅色（北京时间日间）' : '自动模式：深色（北京时间夜间）'
+      : appStore.managedThemeMode === 'light' ? '跟随站点设置：浅色' : '跟随站点设置：深色',
     light: '浅色主题',
     dark: '深色主题',
   } as const

@@ -61,8 +61,8 @@ const excludeFreeNodes = ref(true)
 
 const quickControlDefinitions: Record<HomeQuickControlKey, QuickControlOption> = {
   default: { key: 'default', label: '默认', icon: 'tabler:sort-ascending' },
-  monthlyCost: { key: 'monthlyCost', label: '月成本', icon: 'tabler:calendar-dollar' },
-  totalTraffic: { key: 'totalTraffic', label: '总流量', icon: 'tabler:database' },
+  monthlyCost: { key: 'monthlyCost', label: '月费用', icon: 'tabler:calendar-dollar' },
+  totalTraffic: { key: 'totalTraffic', label: '累计流量', icon: 'tabler:database' },
   upload: { key: 'upload', label: '上行', icon: 'tabler:chevron-up' },
   download: { key: 'download', label: '下行', icon: 'tabler:chevron-down' },
   peak: { key: 'peak', label: '峰值', icon: 'tabler:activity' },
