@@ -164,7 +164,7 @@ with zipfile.ZipFile(archive_path) as archive:
             "默认,月费用,累计流量,上行,下行,峰值,离线,高负载,即将到期",
         ),
         "backgroundType": ("图片", "图片,视频"),
-        "networkLatencyRatingMode": ("路径自适应", "路径自适应,固定阈值"),
+        "networkLatencyRatingMode": ("地理距离", "地理距离,固定阈值"),
     }
     items_by_key = {
         item.get("key"): item
@@ -233,11 +233,13 @@ try:
 
     choice_migrations = {
         "networkLatencyRatingMode": ({
-            "adaptive": "路径自适应",
-            "路径自适应": "路径自适应",
+            "adaptive": "地理距离",
+            "路径自适应": "地理距离",
+            "geographic": "地理距离",
+            "地理距离": "地理距离",
             "fixed": "固定阈值",
             "固定阈值": "固定阈值",
-        }, "路径自适应"),
+        }, "地理距离"),
         "themeMode": ({
             "beijing": "自动",
             "beijingtime": "自动",
@@ -385,8 +387,10 @@ if "7 天" not in javascript:
     raise SystemExit("Seven-day ping history preset is missing")
 if "siteIconUrl" not in javascript:
     raise SystemExit("Custom site icon implementation is missing")
-if "komari-theme:latency-baseline:v1:" not in javascript or "按路径正常基线评级" not in javascript:
-    raise SystemExit("Path-relative latency rating implementation is missing")
+if "按地理距离评级" not in javascript or "光纤传播 RTT 下限" not in javascript:
+    raise SystemExit("Geographical latency rating implementation is missing")
+if "komari-theme:latency-baseline:v1:" in javascript or "路径基线学习中" in javascript:
+    raise SystemExit("Obsolete path-relative baseline implementation is still present")
 configuration = manifest.get("configuration", {})
 configuration_items = configuration.get("data", [])
 textbox_markup = [
@@ -418,7 +422,7 @@ if not icon_item or icon_item.get("default") != "":
     raise SystemExit("Custom site icon setting is missing from the manifest")
 
 expected_saved_choices = {
-    "networkLatencyRatingMode": {"路径自适应", "固定阈值"},
+    "networkLatencyRatingMode": {"地理距离", "固定阈值"},
     "themeMode": {"自动", "浅色", "深色"},
     "rpcTransportMode": {"HTTP", "WebSocket"},
     "defaultViewMode": {"卡片", "列表"},
@@ -522,7 +526,7 @@ print("SEVEN_DAY_PRESET=ok")
 print("CUSTOM_SITE_ICON=ok")
 print("LOCAL_ICON_UPLOAD_LINK=ok")
 print("MANAGED_UI_MIGRATION=ok")
-print("ADAPTIVE_LATENCY_RATING=ok")
+print("GEOGRAPHIC_LATENCY_RATING=ok")
 print("HISTORY_API=" + history_api_status)
 PY
 

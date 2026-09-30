@@ -2,7 +2,7 @@
   "name": "Komari 毛玻璃增强主题（MXH）",
   "short": "GlassmorphismEnhanced",
   "description": "MXH 个人适配版 Komari 毛玻璃主题，支持历史指标兼容访问、自定义站点图标、默认节点顺序及 IPv4/IPv6/WARP 三网延迟与丢包历史",
-  "version": "2.2.2-mxh.6",
+  "version": "2.2.2-mxh.7",
   "author": "jianmomo / mxh110708",
   "url": "https://github.com/mxh110708/komari-theme-Glassmorphism-Enhanced-Custom",
   "preview": "preview-v2.0.0.png",
@@ -192,16 +192,23 @@
         "key": "networkLatencyRatingMode",
         "name": "延迟评级模式",
         "type": "select",
-        "default": "路径自适应",
-        "options": "路径自适应,固定阈值",
-        "help": "自适应模式按各服务器、运营商与 IPv4/IPv6 检测任务的历史正常基线评级，参考最近 7 天有效记录。真实延迟与检测失败率保持不变；记录不足时暂不评级。"
+        "default": "地理距离",
+        "options": "地理距离,固定阈值",
+        "help": "按机房与检测目标的地理距离使用统一评级公式；同地区共用阈值，不按服务器、运营商或历史延迟放宽。真实延迟与检测失败率保持不变；无法确定位置时暂不评级。"
       },
       {
-        "key": "networkLatencyBaselineVersion",
-        "name": "路径基线重建标识",
-        "type": "number",
-        "default": 1,
-        "help": "仅在线路或检测目标永久变更后增大此整数，让各浏览器重新学习基线。日常无需调整；请勿在临时拥塞期间重建基线。"
+        "key": "networkLatencyNodeLocations",
+        "name": "机房位置补充（可选）",
+        "type": "string",
+        "default": "",
+        "help": "自动识别节点名称中的洛杉矶、圣何塞、法兰克福及其城市缩写，不以国家中心或访客位置替代机房。其他位置可填写 JSON 数组：[{\"match\":\"节点名称关键词\",\"label\":\"城市名称\",\"latitude\":纬度,\"longitude\":经度}]。补充项优先；多个匹配位置冲突时暂不评级。"
+      },
+      {
+        "key": "networkLatencyTaskLocations",
+        "name": "检测目标位置补充（可选）",
+        "type": "string",
+        "default": "",
+        "help": "根据检测任务名称识别地区；广东使用广州作为地区参考点，三网与 IPv4/IPv6 共用位置。实际目标不在该地区或需要更精确坐标时，可填写 JSON 数组：[{\"match\":\"任务名称关键词\",\"label\":\"目标地区\",\"latitude\":纬度,\"longitude\":经度}]。不使用浏览器所在地或历史延迟推断位置。"
       },
       {
         "key": "homeQuickControlsEnabled",

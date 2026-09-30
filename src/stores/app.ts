@@ -3,6 +3,7 @@ import type { ByteDecimalsConfig } from '@/utils/helper'
 import { useStorageAsync } from '@vueuse/core'
 import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
+import { parseLatencyLocationRules } from '@/utils/latencyRating'
 
 export type ThemeMode = 'auto' | 'light' | 'dark'
 export type ManagedThemeMode = 'beijing' | 'light' | 'dark'
@@ -630,12 +631,13 @@ const useAppStore = defineStore('app', () => {
 
   const homeExpiringDays = computed<number>(() => readNumberSetting(themeSettings.value, 'homeExpiringDays', 30, 1, 3650))
 
-  const networkLatencyRatingMode = computed<'adaptive' | 'fixed'>(() => {
+  const networkLatencyRatingMode = computed<'geographic' | 'fixed'>(() => {
     const value = normalizeOptionToken(themeSettings.value.networkLatencyRatingMode)
-    return value === 'fixed' || value === '固定阈值' ? 'fixed' : 'adaptive'
+    return value === 'fixed' || value === '固定阈值' ? 'fixed' : 'geographic'
   })
 
-  const networkLatencyBaselineVersion = computed<number>(() => Math.floor(readNumberSetting(themeSettings.value, 'networkLatencyBaselineVersion', 1, 1, 1_000_000)))
+  const networkLatencyNodeLocations = computed(() => parseLatencyLocationRules(themeSettings.value.networkLatencyNodeLocations))
+  const networkLatencyTaskLocations = computed(() => parseLatencyLocationRules(themeSettings.value.networkLatencyTaskLocations))
 
   const hideAdminEntryWhenLoggedOut = computed<boolean>(() => readBooleanSetting(themeSettings.value, 'hideAdminEntryWhenLoggedOut', false))
 
@@ -776,7 +778,8 @@ const useAppStore = defineStore('app', () => {
     homeTrafficWarningThreshold,
     homeExpiringDays,
     networkLatencyRatingMode,
-    networkLatencyBaselineVersion,
+    networkLatencyNodeLocations,
+    networkLatencyTaskLocations,
     hideAdminEntryWhenLoggedOut,
     hidePriceWhenLoggedOut,
     providerAliases,

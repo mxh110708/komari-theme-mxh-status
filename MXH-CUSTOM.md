@@ -44,35 +44,59 @@ or a site-relative path beginning with `/`; when set it overrides the locally
 uploaded icon. Leave it empty to use `/favicon.ico`, with the bundled theme icon
 as the final fallback.
 
-## Path-relative latency ratings (2.2.2-mxh.6)
+## Geographical latency ratings (2.2.2-mxh.7)
 
-Latency remains the actual measured value. In the default adaptive mode, every
-node and probe task has an independent reference; this separates carriers,
-IPv4/IPv6, and different destinations without guessing from a visitor IP or a
-country flag. The display uses the path's P10 over up to seven days of successful
-records. At least 30 valid observations spanning six hours are required. Until
-then, successful samples are neutral and marked as learning; failed samples
-remain red. Packet/probe failure rates keep their existing independent scale.
+The default `地理距离` mode replaces the per-server historical baselines from
+2.2.2-mxh.6. All nodes, carriers, and protocols use the same distance formula.
+CN2 GIA, 163 and other routes between the same cities receive identical limits:
+better routing can score better, while sustained detours cannot redefine normal.
+Measured millisecond values and the independent probe-failure scale do not change.
 
-For reference B, the four rating limits are B + max(15 ms, 10% B),
-B + max(35 ms, 25% B), B + max(65 ms, 50% B), and B + max(100 ms, 100% B).
-These are theme display heuristics, not an industry standard or estimates of
-physical distance. A stable detour can still have good relative stability;
-compare the unchanged millisecond values to assess absolute responsiveness.
+For great-circle distance d in kilometres, the approximate fibre propagation
+round-trip lower bound T is d / 100 milliseconds (200 km/ms fibre speed).
+The four inclusive grade limits are rounded to whole milliseconds:
 
-Each browser keeps a validated path-specific reference that can decrease but
-does not automatically rise with congestion. Cached references expire after
-30 days without fresh qualifying observations. If a route or destination
-permanently changes, increase the managed `networkLatencyBaselineVersion` value
-to explicitly relearn. No credentials or raw historical records are stored in
-this additional cache. The `networkLatencyRatingMode` setting can restore the
-legacy fixed thresholds. Card and list views both use path-specific references;
-list colors report the worst path grade within each displayed time bucket.
+| Grade | Upper limit                               |
+| ----- | ----------------------------------------- |
+| 优秀  | 1.5 T + 15 ms                             |
+| 良好  | 1.8 T + 25 ms                             |
+| 一般  | 2.2 T + 35 ms                             |
+| 较差  | 2.8 T + 45 ms                             |
+| 差    | Above the fourth limit, or a failed probe |
 
-The long-window request is shared across nodes and refreshed every 30 minutes;
-the existing recent-history refresh remains once per minute. Existing metrics,
-theme preferences, ordering, icons, transport selection, and proxy settings are
-not changed by the grading mode.
+This is one explicit theme display policy, not an industry standard. T is a
+physical reference, not measured one-way latency or the actual cable length.
+The multipliers and fixed margins are universal; no carrier or historical RTT
+can change them. The fibre-speed approximation is consistent with the
+[Duke explanation of propagation in silica fibre](https://www.today.duke.edu/2022/04/web-surfing-feels-instantaneous).
+
+City names and unambiguous city tokens in node/task names identify locations.
+Built-in reference points currently cover Los Angeles (LA/LAX), San Jose (SJC),
+Frankfurt (FRA), and Guangdong/Guangzhou. Guangdong probes use Guangzhou as a
+clearly labelled regional reference, not an assertion of their exact rack site.
+Coordinates are based on Wikidata [Q65](https://www.wikidata.org/wiki/Q65),
+[Q16553](https://www.wikidata.org/wiki/Q16553),
+[Q1794](https://www.wikidata.org/wiki/Q1794) and
+[Q16572](https://www.wikidata.org/wiki/Q16572).
+No country centroid, visitor location, IP-geolocation query, RTT history, or
+route-brand matching is used to derive rating limits.
+
+`networkLatencyNodeLocations` and `networkLatencyTaskLocations` accept optional
+JSON arrays of `{match, label, latitude, longitude}`. A case-insensitive name
+substring selects a coordinate override; it does not define a private threshold.
+Coordinates must be finite and in valid ranges. Invalid configuration, unknown
+locations or conflicting matching coordinates leave successful probes neutral
+with a configuration hint; failures remain red. A known country flag contradicting
+an inferred city also prevents automatic grading. Explicit coordinates take
+precedence. Do not put addresses, node UUIDs or credentials in public examples.
+
+Card tooltips expose both regions, approximate distance and all actual limits.
+List colors report the worst individual geographical path grade per time bucket.
+The legacy `固定阈值` option remains available. Installation migrates saved
+`路径自适应` choices to `地理距离`, preserving all unrelated preferences.
+Old baseline caches and `networkLatencyBaselineVersion` are no longer read;
+there is no learning period or extra seven-day history query. Existing recent
+history continues to refresh once per minute through shared requests.
 
 ## Build
 
