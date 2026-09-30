@@ -630,6 +630,13 @@ const useAppStore = defineStore('app', () => {
 
   const homeExpiringDays = computed<number>(() => readNumberSetting(themeSettings.value, 'homeExpiringDays', 30, 1, 3650))
 
+  const networkLatencyRatingMode = computed<'adaptive' | 'fixed'>(() => {
+    const value = normalizeOptionToken(themeSettings.value.networkLatencyRatingMode)
+    return value === 'fixed' || value === '固定阈值' ? 'fixed' : 'adaptive'
+  })
+
+  const networkLatencyBaselineVersion = computed<number>(() => Math.floor(readNumberSetting(themeSettings.value, 'networkLatencyBaselineVersion', 1, 1, 1_000_000)))
+
   const hideAdminEntryWhenLoggedOut = computed<boolean>(() => readBooleanSetting(themeSettings.value, 'hideAdminEntryWhenLoggedOut', false))
 
   const hidePriceWhenLoggedOut = computed<boolean>(() => readBooleanSetting(themeSettings.value, 'hidePriceWhenLoggedOut', false))
@@ -768,6 +775,8 @@ const useAppStore = defineStore('app', () => {
     homeHighLoadThreshold,
     homeTrafficWarningThreshold,
     homeExpiringDays,
+    networkLatencyRatingMode,
+    networkLatencyBaselineVersion,
     hideAdminEntryWhenLoggedOut,
     hidePriceWhenLoggedOut,
     providerAliases,

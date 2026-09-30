@@ -42,7 +42,8 @@ interface SharedPingRecordsEntry {
   error: ReturnType<typeof ref<string | null>>
   promise: Promise<void> | null
   refreshTimer: ReturnType<typeof setInterval> | null
-  subscribers: number
+  subscribers: Map<symbol, number>
+  refreshIntervalMs: number
   lastFetchedAt: number
 }
 
@@ -178,7 +179,8 @@ function createSharedPingRecordsEntry(): SharedPingRecordsEntry {
     error: ref<string | null>(null),
     promise: null,
     refreshTimer: null,
-    subscribers: 0,
+    subscribers: new Map(),
+    refreshIntervalMs: PING_RECORD_REFRESH_INTERVAL_MS,
     lastFetchedAt: 0,
   }
 }
@@ -245,12 +247,18 @@ async function loadSharedPingRecords(entry: SharedPingRecordsEntry, hours: numbe
 }
 
 function startSharedPingRecordsRefresh(entry: SharedPingRecordsEntry, hours: number): void {
-  if (entry.refreshTimer)
+  const interval = Math.min(...entry.subscribers.values())
+  if (entry.refreshTimer && entry.refreshIntervalMs === interval)
     return
+
+  stopSharedPingRecordsRefresh(entry)
+  if (!entry.subscribers.size)
+    return
+  entry.refreshIntervalMs = interval
 
   entry.refreshTimer = setInterval(() => {
     void loadSharedPingRecords(entry, hours).catch(() => {})
-  }, PING_RECORD_REFRESH_INTERVAL_MS)
+  }, interval)
 }
 
 function stopSharedPingRecordsRefresh(entry: SharedPingRecordsEntry): void {
@@ -261,9 +269,10 @@ function stopSharedPingRecordsRefresh(entry: SharedPingRecordsEntry): void {
   entry.refreshTimer = null
 }
 
-function retainSharedPingRecordsEntry(hours: number): () => void {
+function retainSharedPingRecordsEntry(hours: number, refreshIntervalMs: number): () => void {
   const entry = getSharedPingRecordsEntry(hours)
-  entry.subscribers += 1
+  const token = Symbol('ping-subscriber')
+  entry.subscribers.set(token, refreshIntervalMs)
   startSharedPingRecordsRefresh(entry, hours)
 
   let released = false
@@ -272,9 +281,11 @@ function retainSharedPingRecordsEntry(hours: number): () => void {
       return
 
     released = true
-    entry.subscribers = Math.max(0, entry.subscribers - 1)
-    if (entry.subscribers === 0)
+    entry.subscribers.delete(token)
+    if (entry.subscribers.size === 0)
       stopSharedPingRecordsRefresh(entry)
+    else
+      startSharedPingRecordsRefresh(entry, hours)
   }
 }
 
@@ -419,10 +430,13 @@ export function useNodePingStats(
   options?: {
     hours?: MaybeRefOrGetter<number>
     enabled?: MaybeRefOrGetter<boolean>
+    refreshIntervalMs?: number
+    persistStats?: boolean
   },
 ) {
   const loading = ref(false)
   const error = ref<string | null>(null)
+  const refreshIntervalMs = Math.max(PING_RECORD_REFRESH_INTERVAL_MS, options?.refreshIntervalMs ?? PING_RECORD_REFRESH_INTERVAL_MS)
 
   const resolved = computed(() => ({
     uuid: toValue(uuid),
@@ -444,7 +458,7 @@ export function useNodePingStats(
     if (hours === null)
       return
 
-    releaseSharedRecords = retainSharedPingRecordsEntry(hours)
+    releaseSharedRecords = retainSharedPingRecordsEntry(hours, refreshIntervalMs)
     activeHours = hours
   }
 
@@ -489,7 +503,7 @@ export function useNodePingStats(
       syncSharedRecordsSubscription(hours)
       const entry = getSharedPingRecordsEntry(hours)
       const shouldLoadRecords = !entry.data.value
-        || Date.now() - entry.lastFetchedAt >= PING_RECORD_REFRESH_INTERVAL_MS
+        || Date.now() - entry.lastFetchedAt >= refreshIntervalMs
 
       if (!shouldLoadRecords) {
         loading.value = false
@@ -526,13 +540,15 @@ export function useNodePingStats(
     true,
   )
 
-  watch(stats, (value) => {
-    if (!value.hasData)
-      return
-    const { uuid: nodeUuid, hours, enabled } = resolved.value
-    if (enabled && nodeUuid.trim())
-      persistStats(nodeUuid, hours, value)
-  })
+  if (options?.persistStats !== false) {
+    watch(stats, (value) => {
+      if (!value.hasData)
+        return
+      const { uuid: nodeUuid, hours, enabled } = resolved.value
+      if (enabled && nodeUuid.trim())
+        persistStats(nodeUuid, hours, value)
+    })
+  }
 
   return {
     stats,
@@ -544,11 +560,15 @@ export function useNodePingStats(
     avgVolatility: computed(() => stats.value.avgVolatility),
     hasData: computed(() => stats.value.hasData),
     records: computed(() => {
-      const { uuid: nodeUuid, hours } = resolved.value
+      const { uuid: nodeUuid, hours, enabled } = resolved.value
+      if (!enabled)
+        return []
       return getSharedPingRecordsEntry(hours).data.value?.recordsByClient.get(nodeUuid) ?? []
     }),
     tasks: computed(() => {
-      const { hours } = resolved.value
+      const { hours, enabled } = resolved.value
+      if (!enabled)
+        return []
       return getSharedPingRecordsEntry(hours).data.value?.tasks ?? []
     }),
   }

@@ -44,6 +44,36 @@ or a site-relative path beginning with `/`; when set it overrides the locally
 uploaded icon. Leave it empty to use `/favicon.ico`, with the bundled theme icon
 as the final fallback.
 
+## Path-relative latency ratings (2.2.2-mxh.6)
+
+Latency remains the actual measured value. In the default adaptive mode, every
+node and probe task has an independent reference; this separates carriers,
+IPv4/IPv6, and different destinations without guessing from a visitor IP or a
+country flag. The display uses the path's P10 over up to seven days of successful
+records. At least 30 valid observations spanning six hours are required. Until
+then, successful samples are neutral and marked as learning; failed samples
+remain red. Packet/probe failure rates keep their existing independent scale.
+
+For reference B, the four rating limits are B + max(15 ms, 10% B),
+B + max(35 ms, 25% B), B + max(65 ms, 50% B), and B + max(100 ms, 100% B).
+These are theme display heuristics, not an industry standard or estimates of
+physical distance. A stable detour can still have good relative stability;
+compare the unchanged millisecond values to assess absolute responsiveness.
+
+Each browser keeps a validated path-specific reference that can decrease but
+does not automatically rise with congestion. Cached references expire after
+30 days without fresh qualifying observations. If a route or destination
+permanently changes, increase the managed `networkLatencyBaselineVersion` value
+to explicitly relearn. No credentials or raw historical records are stored in
+this additional cache. The `networkLatencyRatingMode` setting can restore the
+legacy fixed thresholds. Card and list views both use path-specific references;
+list colors report the worst path grade within each displayed time bucket.
+
+The long-window request is shared across nodes and refreshed every 30 minutes;
+the existing recent-history refresh remains once per minute. Existing metrics,
+theme preferences, ordering, icons, transport selection, and proxy settings are
+not changed by the grading mode.
+
 ## Build
 
 ```powershell

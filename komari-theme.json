@@ -2,7 +2,7 @@
   "name": "Komari 毛玻璃增强主题（MXH）",
   "short": "GlassmorphismEnhanced",
   "description": "MXH 个人适配版 Komari 毛玻璃主题，支持历史指标兼容访问、自定义站点图标、默认节点顺序及 IPv4/IPv6/WARP 三网延迟与丢包历史",
-  "version": "2.2.2-mxh.5",
+  "version": "2.2.2-mxh.6",
   "author": "jianmomo / mxh110708",
   "url": "https://github.com/mxh110708/komari-theme-Glassmorphism-Enhanced-Custom",
   "preview": "preview-v2.0.0.png",
@@ -187,6 +187,21 @@
       {
         "name": "<div style=\"display:grid;gap:8px;padding:4px 2px 8px;color:var(--gray-11)\"><div style=\"font-size:14px;line-height:1.7\">设置首页筛选、节点排序与预警阈值。</div></div>",
         "type": "textbox"
+      },
+      {
+        "key": "networkLatencyRatingMode",
+        "name": "延迟评级模式",
+        "type": "select",
+        "default": "路径自适应",
+        "options": "路径自适应,固定阈值",
+        "help": "自适应模式按各服务器、运营商与 IPv4/IPv6 检测任务的历史正常基线评级，参考最近 7 天有效记录。真实延迟与检测失败率保持不变；记录不足时暂不评级。"
+      },
+      {
+        "key": "networkLatencyBaselineVersion",
+        "name": "路径基线重建标识",
+        "type": "number",
+        "default": 1,
+        "help": "仅在线路或检测目标永久变更后增大此整数，让各浏览器重新学习基线。日常无需调整；请勿在临时拥塞期间重建基线。"
       },
       {
         "key": "homeQuickControlsEnabled",

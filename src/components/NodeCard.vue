@@ -49,6 +49,8 @@ const {
   detectedProtocols,
   hasSelectedProtocolData,
   pingStats,
+  networkQualityDescription,
+  latencyRatingNote,
 } = useNodePingDisplay(() => props.node.uuid, selectedProtocol)
 
 const parsedNodeTags = computed(() => parseTags(props.node.tags))
@@ -337,7 +339,7 @@ function hasRegion(region: string | null | undefined): boolean {
           @click.stop
         >
           <header class="network-quality-header">
-            <div class="network-quality-title" title="每格表示近期一次真实检测结果">
+            <div class="network-quality-title" :title="networkQualityDescription">
               <span>网络质量</span>
               <Icon icon="lucide:info" width="13" height="13" />
             </div>
@@ -379,7 +381,7 @@ function hasRegion(region: string | null | undefined): boolean {
                     <span class="network-quality-dot" :class="row.dotClass" />
                     <span>{{ row.label }}</span>
                   </div>
-                  <span class="network-quality-value">{{ row.latencyDisplay }}</span>
+                  <span class="network-quality-value" :title="row.latencyDescription">{{ row.latencyDisplay }}</span>
                   <div class="network-quality-bars" :aria-label="`${row.label}延迟历史`">
                     <span
                       v-for="bar in row.latencyBars"
@@ -422,6 +424,9 @@ function hasRegion(region: string | null | undefined): boolean {
               <span><i class="bg-orange-500/90" />较差</span>
               <span><i class="bg-rose-500/90" />差</span>
             </footer>
+            <div class="text-[10px] text-muted-foreground/80 text-center" :title="networkQualityDescription">
+              {{ latencyRatingNote }}
+            </div>
           </template>
         </section>
 
