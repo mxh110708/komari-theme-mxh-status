@@ -129,12 +129,13 @@ export function getGeographicLatencyPath(
   const minimumRttMs = distanceKm / 100
   // One universal display policy. No measured RTT, carrier, ASN or node history
   // enters these limits, so a stable detour cannot teach itself a better grade.
-  const thresholds: LatencyThresholds = [
-    Math.round(minimumRttMs * 1.5 + 15),
-    Math.round(minimumRttMs * 1.8 + 25),
-    Math.round(minimumRttMs * 2.2 + 35),
-    Math.round(minimumRttMs * 2.8 + 45),
-  ]
+  const roundUp = (value: number) => Math.ceil(value / 5) * 5
+  const excellent = roundUp(minimumRttMs * 1.3 + 15)
+  // Maintain distinct levels for very short geographical paths too.
+  const good = Math.max(excellent + 10, roundUp(minimumRttMs * 1.5 + 20))
+  const average = Math.max(good + 10, roundUp(minimumRttMs * 1.85 + 20))
+  const poor = Math.max(average + 10, roundUp(minimumRttMs * 2.3 + 25))
+  const thresholds: LatencyThresholds = [excellent, good, average, poor]
   return { node, target, distanceKm, minimumRttMs, thresholds }
 }
 

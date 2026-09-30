@@ -44,7 +44,7 @@ or a site-relative path beginning with `/`; when set it overrides the locally
 uploaded icon. Leave it empty to use `/favicon.ico`, with the bundled theme icon
 as the final fallback.
 
-## Geographical latency ratings (2.2.2-mxh.7)
+## Geographical latency ratings (2.2.2-mxh.8)
 
 The default `地理距离` mode replaces the per-server historical baselines from
 2.2.2-mxh.6. All nodes, carriers, and protocols use the same distance formula.
@@ -54,15 +54,21 @@ Measured millisecond values and the independent probe-failure scale do not chang
 
 For great-circle distance d in kilometres, the approximate fibre propagation
 round-trip lower bound T is d / 100 milliseconds (200 km/ms fibre speed).
-The four inclusive grade limits are rounded to whole milliseconds:
+The stricter universal limits replace the initial generous margins in .7.
+Round each limit up to the next 5 ms, with at least 10 ms between adjacent
+limits so short-distance paths retain all five grades:
 
 | Grade | Upper limit                               |
 | ----- | ----------------------------------------- |
-| 优秀  | 1.5 T + 15 ms                             |
-| 良好  | 1.8 T + 25 ms                             |
-| 一般  | 2.2 T + 35 ms                             |
-| 较差  | 2.8 T + 45 ms                             |
+| 优秀  | 1.3 T + 15 ms                             |
+| 良好  | 1.5 T + 20 ms                             |
+| 一般  | 1.85 T + 20 ms                            |
+| 较差  | 2.3 T + 25 ms                             |
 | 差    | Above the fourth limit, or a failed probe |
+
+For Guangdong (Guangzhou reference) ↔ Los Angeles, these limits are 170, 195,
+240 and 295 ms. San Jose uses 165, 190, 230 and 285 ms; Frankfurt uses 135,
+160, 190 and 235 ms. These differ only with distance, never with route brand.
 
 This is one explicit theme display policy, not an industry standard. T is a
 physical reference, not measured one-way latency or the actual cable length.
