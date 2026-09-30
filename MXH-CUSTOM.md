@@ -1,6 +1,6 @@
-# MXH personal build
+# MXH Status implementation notes
 
-This private archive tracks the personal Komari theme derived from
+This public repository maintains MXH Status, a Komari theme derived from
 `jianmomo/komari-theme-Glassmorphism-Enhanced`.
 
 ## Personal changes
@@ -112,8 +112,23 @@ bun run lint
 bun run build
 ```
 
-The build produces `komari-theme-Glassmorphism-build-<commit>.zip` for import in
+The build produces `komari-theme-mxh-status-build-<commit>.zip` for import in
 the Komari theme manager.
+
+## Branding and compatibility (2.2.2-mxh.9)
+
+The project is named `komari-theme-mxh-status`. The manifest, package metadata,
+footer, repository links and build artifacts use the MXH Status identity.
+The MIT license retains all upstream copyright notices and adds the MXH changes.
+
+The internal `GlassmorphismEnhanced` identifier remains unchanged so existing
+theme selections and saved preferences do not need a destructive migration.
+Komari's embedded managed-settings page currently displays this identifier in
+its heading instead of the manifest's friendly label. The installation script
+creates a narrowly scoped compatibility override for that page's loaded asset,
+replacing only this theme's heading with `MXH Status 外观`. Other themes, form
+controls, login, permissions and save logic remain unchanged. The adapter is
+idempotent and rejects an unrecognized frontend before any live files change.
 
 This repository must not contain Komari databases, backups, administrator
 credentials, Cloudflare Tunnel tokens, VPS archives, or private keys.

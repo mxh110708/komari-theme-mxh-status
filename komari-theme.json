@@ -1,10 +1,10 @@
 {
-  "name": "Komari 毛玻璃增强主题（MXH）",
+  "name": "MXH Status",
   "short": "GlassmorphismEnhanced",
-  "description": "MXH 个人适配版 Komari 毛玻璃主题，支持历史指标兼容访问、自定义站点图标、默认节点顺序及 IPv4/IPv6/WARP 三网延迟与丢包历史",
-  "version": "2.2.2-mxh.8",
-  "author": "jianmomo / mxh110708",
-  "url": "https://github.com/mxh110708/komari-theme-Glassmorphism-Enhanced-Custom",
+  "description": "面向中文监控场景的 Komari 主题：毛玻璃界面、可配置总览、真实网络检测历史及统一地理距离延迟评级",
+  "version": "2.2.2-mxh.9",
+  "author": "mxh110708",
+  "url": "https://github.com/mxh110708/komari-theme-mxh-status",
   "preview": "preview-v2.0.0.png",
   "configuration": {
     "type": "managed",

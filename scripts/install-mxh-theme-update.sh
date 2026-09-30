@@ -93,12 +93,14 @@ trap cleanup EXIT INT TERM
 
 python3 - "$ZIP_PATH" "$stage_dir" "$THEME_SHORT" "$THEME_VERSION" <<'PY'
 import json
+from html.parser import HTMLParser
 from pathlib import Path, PurePosixPath
 import re
 import shutil
 import stat
 import sys
 import zipfile
+from urllib.request import urlopen
 
 archive_path, stage_path, expected_short, expected_version = sys.argv[1:]
 stage = Path(stage_path)
@@ -186,6 +188,64 @@ with zipfile.ZipFile(archive_path) as archive:
         with archive.open(entry) as source, target.open("wb") as destination:
             shutil.copyfileobj(source, destination)
         target.chmod(0o644)
+
+# Komari's managed-page heading uses the storage ID rather than a friendly
+# manifest name. Override only that heading in the currently embedded asset;
+# keep the ID, all form behavior and the embedded login frontend unchanged.
+def brand_managed_title(source, theme_short):
+    marker = "/* MXH Status managed-title compatibility */"
+    condition = json.dumps(theme_short) + '?"MXH Status 外观":'
+    if marker in source:
+        if source.count(condition) != 2:
+            raise ValueError("Existing managed-title override is invalid")
+        return source
+    pattern = re.compile(
+        r'(?P<theme>[A-Za-z_$][\w$]*)\?'
+        r'(?P<t>[A-Za-z_$][\w$]*)\("theme\.manage_with_name",'
+        r'\{name:(?P=theme)==="default"\?"":(?P=theme)\}\):'
+        r'(?P=t)\("theme\.title"\)'
+    )
+    if len(list(pattern.finditer(source))) != 2:
+        raise ValueError("Unrecognized Komari managed-page heading; no live files changed")
+    return marker + "\n" + pattern.sub(
+        lambda match: match['theme'] + "===" + condition + match[0], source
+    )
+
+class EntryScripts(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.sources = []
+    def handle_starttag(self, tag, attrs):
+        attrs = dict(attrs)
+        if tag == 'script' and attrs.get('type') == 'module':
+            self.sources.append(attrs.get('src', ''))
+
+def read_frontend_asset(path):
+    with urlopen('http://127.0.0.1:25774' + path, timeout=15) as response:
+        content = response.read((8 << 20) + 1)
+    if len(content) > 8 << 20:
+        raise ValueError("Komari frontend asset is oversized")
+    return content.decode('utf-8')
+
+parser = EntryScripts()
+parser.feed(read_frontend_asset('/admin/theme_managed'))
+entries = [src for src in parser.sources if re.fullmatch(r'/assets/[A-Za-z0-9_-]+\.js', src)]
+if len(entries) != 1:
+    raise ValueError("Komari frontend entry could not be identified safely")
+entry_source = read_frontend_asset(entries[0])
+managed_assets = set(re.findall(r'assets/chunk-theme_managed-[A-Za-z0-9_-]+\.js', entry_source))
+if len(managed_assets) != 1:
+    raise ValueError("Komari managed-page asset could not be identified safely")
+managed_asset = next(iter(managed_assets))
+managed_source = read_frontend_asset('/' + managed_asset)
+branded_source = brand_managed_title(managed_source, expected_short)
+override_path = stage / 'dist' / managed_asset
+if override_path.exists():
+    raise ValueError("Theme archive unexpectedly overrides the managed-page asset")
+override_path.parent.mkdir(parents=True, exist_ok=True)
+override_path.write_text(branded_source, encoding='utf-8')
+override_path.chmod(0o644)
+print('MANAGED_TITLE_PREPARED=ok')
 PY
 
 systemctl stop komari.service
@@ -374,6 +434,18 @@ database, expected_short, expected_version, expected_order, snapshot_path = sys.
 manifest = json.loads((theme_dir / "komari-theme.json").read_text(encoding="utf-8"))
 if manifest.get("short") != expected_short or manifest.get("version") != expected_version:
     raise SystemExit("Installed manifest does not match the release")
+if manifest.get("name") != "MXH Status" or manifest.get("configuration", {}).get("name") != "MXH Status 外观":
+    raise SystemExit("Installed theme branding is inconsistent")
+managed_overrides = [
+    path for path in (theme_dir / "dist/assets").glob("chunk-theme_managed-*.js")
+    if "/* MXH Status managed-title compatibility */" in path.read_text(encoding="utf-8")
+]
+if len(managed_overrides) != 1:
+    raise SystemExit("Managed-page title override is missing or ambiguous")
+with urlopen("http://127.0.0.1:25774/assets/" + managed_overrides[0].name, timeout=10) as response:
+    served_override = response.read().decode("utf-8")
+if served_override != managed_overrides[0].read_text(encoding="utf-8"):
+    raise SystemExit("Managed-page title override is not being served")
 
 javascript = "\n".join(
     path.read_text(encoding="utf-8", errors="ignore")
@@ -526,6 +598,7 @@ print("SEVEN_DAY_PRESET=ok")
 print("CUSTOM_SITE_ICON=ok")
 print("LOCAL_ICON_UPLOAD_LINK=ok")
 print("MANAGED_UI_MIGRATION=ok")
+print("MANAGED_TITLE=MXH Status 外观")
 print("GEOGRAPHIC_LATENCY_RATING=ok")
 print("HISTORY_API=" + history_api_status)
 PY

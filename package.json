@@ -1,11 +1,11 @@
 {
-  "name": "komari-theme-glassmorphism-enhanced",
+  "name": "komari-theme-mxh-status",
   "type": "module",
-  "version": "2.2.2-mxh.8",
+  "version": "2.2.2-mxh.9",
   "packageManager": "bun@1.3.14",
   "author": {
-    "name": "jianmomo",
-    "url": "https://github.com/jianmomo"
+    "name": "mxh110708",
+    "url": "https://github.com/mxh110708"
   },
   "license": "MIT",
   "engines": {
