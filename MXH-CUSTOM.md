@@ -32,6 +32,8 @@ The installation script maps only recognized saved choices to their Chinese
 equivalents. It preserves all other fields, including custom node ordering, and
 checks them against the pre-install database snapshot. Unknown saved choices
 fail the installation rather than silently selecting a different mode.
+Installation checks accept both node arrays and UUID-keyed node maps, as well as
+flat and UUID-grouped load history, matching the theme's runtime compatibility.
 
 The default order can be changed in the managed theme setting
 `homeDefaultNodeOrder` with a comma-separated list of node-name keywords.

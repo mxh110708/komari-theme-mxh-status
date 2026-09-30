@@ -479,17 +479,28 @@ def rpc(method, params=None):
 history_api_status = "ok"
 try:
     nodes = rpc("common:getNodes")
-    if not isinstance(nodes, list) or not nodes:
+    if isinstance(nodes, dict) and nodes:
+        node_id, node = next(iter(nodes.items()))
+        nodes_format = "map"
+    elif isinstance(nodes, list) and nodes:
+        node = nodes[0]
+        node_id = node.get("uuid") if isinstance(node, dict) else None
+        nodes_format = "list"
+    else:
         raise SystemExit("RPC2 node list is unavailable")
-    node_id = nodes[0].get("uuid")
-    if not node_id:
+    if not isinstance(node, dict) or not isinstance(node_id, str) or not node_id:
         raise SystemExit("RPC2 node identifier is unavailable")
     records = rpc(
         "common:getRecords",
         {"type": "load", "uuid": node_id, "hours": 4, "max_count": 600},
     )
-    if not isinstance(records, dict) or not isinstance(records.get("records"), list):
+    history = records.get("records") if isinstance(records, dict) else None
+    if isinstance(history, dict):
+        history = history.get(node_id)
+    if not isinstance(history, list):
         raise SystemExit("RPC2 historical load response is invalid")
+    print("NODES_API_FORMAT=" + nodes_format)
+    print("NODE_COUNT=" + str(len(nodes)))
 except HTTPError as error:
     if error.code != 401:
         raise
